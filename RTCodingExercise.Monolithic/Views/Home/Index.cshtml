@@ -1,17 +1,40 @@
 ﻿@model List<Plate>
 
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Available Plates for Sale";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+    <h1 class="display-4">Available Plates for Sale</h1>
+    </div>
 
-<ul>
-    @foreach(var p in Model)
+
+<a href="@Url.Action("AddPlate")">Add a New Plate</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Plate</th>
+            <th>Purchase Price</th>
+            <th>Sale Price</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var p in Model)
+        {
+            <tr>
+                <td>@p.Registration</td>
+                <td>@p.PurchasePrice</td>
+                <td>@(p.SalePrice * 1.2m)</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div>
+    @if (ViewBag.Page > 1)
     {
-        <li>@p.Registration</li>
+        <a href="?page=@(ViewBag.Page - 1)">Previous</a>
     }
-</ul>
+    <a href="?page=@(ViewBag.Page + 1)">Next</a>
+    <p>Page: @ViewBag.Page</p>
+</div>

@@ -1,0 +1,36 @@
+﻿@model Plate
+
+<h2>Add a New Plate</h2>
+
+<form asp-action="AddPlate" method="post">
+    <div class="form-group">
+        <label for="Registration">Plate Registration</label>
+        <input asp-for="Registration" class="form-control" />
+        <span asp-validation-for="Registration" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label for="PurchasePrice">Purchase Price</label>
+        <input asp-for="PurchasePrice" class="form-control" step="0.01" />
+        <span asp-validation-for="PurchasePrice" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label for="SalePrice">Sale Price</label>
+        <input asp-for="SalePrice" class="form-control" step="0.01" />
+        <span asp-validation-for="SalePrice" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label for="Letters">Letters</label>
+        <input asp-for="Letters" class="form-control" />
+        <span asp-validation-for="Letters" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label for="Numbers">Numbers</label>
+        <input asp-for="Numbers" class="form-control" />
+        <span asp-validation-for="Numbers" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Add Plate</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
