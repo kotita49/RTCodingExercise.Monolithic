@@ -33,12 +33,21 @@ namespace RTCodingExercise.Monolithic.Controllers
         [HttpPost]
         public async Task<IActionResult> AddPlate(Plate plate)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
+            {
+                return View(plate);
+            }
+
+            try
             {
                 await _plateService.AddPlateAsync(plate);
-                return RedirectToAction("Index");  
+                return RedirectToAction("Index");
             }
-            return View(plate);
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("Error", "An error occurred while adding the plate.");
+                return View(plate);
+            }
         }
 
         public IActionResult Privacy()

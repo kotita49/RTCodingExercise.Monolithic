@@ -56,4 +56,28 @@ public class HomeControllerTests
         Assert.NotNull(result);
         Assert.Equal("Index", result.ActionName);
     }
+
+    [Fact]
+    public async Task Index_ShouldReturnEmptyList_WhenNoPlatesExist()
+    {
+        _mockPlateService.Setup(service => service.GetPlatesForPageAsync(1, 20)).ReturnsAsync(new List<Plate>());
+
+        var result = await _controller.Index(1) as ViewResult;
+
+        Assert.NotNull(result);
+        var model = result.Model as List<Plate>;
+        Assert.Empty(model); // Empty list if no plates are available
+    }
+
+    [Fact]
+    public async Task AddPlateAsync_ShouldHandleServiceFailure_WhenExceptionIsThrown()
+    {
+        var plate = new Plate { Id = Guid.NewGuid(), Registration = "A123", PurchasePrice = 100, SalePrice = 1200 };
+        _mockPlateService.Setup(service => service.AddPlateAsync(It.IsAny<Plate>())).ThrowsAsync(new Exception("Service Error"));
+
+        var result = await _controller.AddPlate(plate) as ViewResult;
+
+        Assert.NotNull(result);
+        Assert.True(_controller.ModelState.ContainsKey("Error"));
+    }
 }
