@@ -12,9 +12,14 @@ namespace RTCodingExercise.Monolithic.Services
             _context = context;
         }
 
-        public async Task<List<Plate>> GetPlatesForPageAsync(int page, int pageSize, string sortOrder = "asc")
+        public async Task<List<Plate>> GetPlatesForPageAsync(int page, int pageSize, string sortOrder = "asc", string? filter = null)
         {
             var query = _context.Plates.AsQueryable();
+
+            if (!string.IsNullOrEmpty(filter))
+            {
+                query = query.Where(p => p.Registration.Contains(filter));
+            }
 
             query = sortOrder == "desc"
                 ? query.OrderByDescending(p => p.SalePrice)

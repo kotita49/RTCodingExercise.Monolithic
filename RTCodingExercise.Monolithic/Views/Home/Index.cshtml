@@ -4,13 +4,22 @@
     ViewData["Title"] = "Available Plates for Sale";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Available Plates for Sale</h1>
+<div class="text-center mb-4" ">
+    <h1 class="display-4 font-weight-bold">Available Plates for Sale</h1>
     </div>
-
-<a href="?sortOrder=@(ViewBag.SortOrder == "asc" ? "desc" : "asc")">Sort by Price</a>
-<a href="@Url.Action("AddPlate")">Add a New Plate</a>
-
+<div class="d-flex justify-content-between mb-4">
+    
+    <form method="get" asp-action="Index" class="d-flex">
+    <input type="text" name="filter" value="@ViewBag.Filter" class="form-control mr-2" placeholder="Enter letters/numbers" />
+    <button type="submit" class="btn btn-primary">Search</button>
+</div>
+        <div class="mb-4">
+            <a href="?sortOrder=@(ViewBag.SortOrder == "asc" ? "desc" : "asc")" class="ml-3 align-self-center">Sort by Price</a>
+       </div>
+       <div>        
+        <a href="@Url.Action("AddPlate")" class="btn btn-success">Add a New Plate</a>
+    </div>
+    
 <table class="table">
     <thead>
         <tr>

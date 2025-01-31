@@ -16,12 +16,13 @@ namespace RTCodingExercise.Monolithic.Controllers
             _plateService = plateService;
         }
 
-        public async Task<IActionResult> Index(int page = 1, string sortOrder = "asc")
+        public async Task<IActionResult> Index(int page = 1, string sortOrder = "asc", string? filter = null)
         {
            const int pageSize = 20;
-           var plates = await _plateService.GetPlatesForPageAsync(page, pageSize, sortOrder);
+           var plates = await _plateService.GetPlatesForPageAsync(page, pageSize, sortOrder, filter);
            ViewBag.Page = page;
            ViewBag.SortOrder = sortOrder;
+           ViewBag.Filter = filter; 
 
             return View(plates);
         }

@@ -4,7 +4,7 @@ namespace RTCodingExercise.Monolithic.Services
 {
     public interface IPlateService
     {
-        Task<List<Plate>> GetPlatesForPageAsync(int page, int pageSize, string sortOrder = "asc");
+        Task<List<Plate>> GetPlatesForPageAsync(int page, int pageSize, string sortOrder = "asc", string? filter = null);
         Task AddPlateAsync(Plate plate);
     }
 }
