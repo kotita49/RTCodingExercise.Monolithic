@@ -12,9 +12,15 @@ namespace RTCodingExercise.Monolithic.Services
             _context = context;
         }
 
-        public async Task<List<Plate>> GetPlatesForPageAsync(int page, int pageSize)
+        public async Task<List<Plate>> GetPlatesForPageAsync(int page, int pageSize, string sortOrder = "asc")
         {
-            return await _context.Plates
+            var query = _context.Plates.AsQueryable();
+
+            query = sortOrder == "desc"
+                ? query.OrderByDescending(p => p.SalePrice)
+                : query.OrderBy(p => p.SalePrice);
+
+            return await query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
