@@ -52,6 +52,20 @@ namespace RTCodingExercise.Monolithic.Controllers
             }
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ToggleReservation(Guid plateId)
+        {
+            var plateToUpdate = await _plateService.GetPlateByIdAsync(plateId);
+            if (plateToUpdate != null)
+            {
+                bool newStatus = !plateToUpdate.Reserved;
+                await _plateService.SetPlateReservationStatusAsync(plateId, newStatus);
+                _logger.LogInformation($"Plate {plateToUpdate?.Registration} has been marked as {(newStatus ? "reserved" : "unreserved")}");
+            }
+
+            return RedirectToAction("Index");
+        }
         public IActionResult Privacy()
         {
             return View();

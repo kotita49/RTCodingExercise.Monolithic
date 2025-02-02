@@ -18,7 +18,8 @@ namespace RTCodingExercise.Monolithic.Migrations
                     PurchasePrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     SalePrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Letters = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Numbers = table.Column<int>(type: "int", nullable: false)
+                    Numbers = table.Column<int>(type: "int", nullable: false),
+                    Reserved = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
                 },
                 constraints: table =>
                 {

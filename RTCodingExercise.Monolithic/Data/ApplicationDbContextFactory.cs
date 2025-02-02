@@ -14,7 +14,7 @@ namespace RTCodingExercise.Monolithic.Factories
 
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
 
-            optionsBuilder.UseSqlServer(config["ConnectionString"], sqlServerOptionsAction: o => o.MigrationsAssembly("RTCodingExercise.Monolithic"));
+            optionsBuilder.UseSqlServer(config.GetConnectionString("DefaultConnection"), sqlServerOptionsAction: o => o.MigrationsAssembly("RTCodingExercise.Monolithic"));
 
             return new ApplicationDbContext(optionsBuilder.Options);
         }

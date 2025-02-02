@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RTCodingExercise.Monolithic.Data;
 
@@ -11,9 +12,10 @@ using RTCodingExercise.Monolithic.Data;
 namespace RTCodingExercise.Monolithic.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250131140307_AddReservedColumn")]
+    partial class AddReservedColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,13 +40,13 @@ namespace RTCodingExercise.Monolithic.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Registration")
-                        .HasColumnType("nvarchar(max)");                    
-
-                    b.Property<decimal>("SalePrice")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("Reserved")
                         .HasColumnType("bit");
+
+                    b.Property<decimal>("SalePrice")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 

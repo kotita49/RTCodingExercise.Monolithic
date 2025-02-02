@@ -8,13 +8,15 @@
     <h1 class="display-4 font-weight-bold">Available Plates for Sale</h1>
     </div>
 <div class="d-flex justify-content-between mb-4">
-    
     <form method="get" asp-action="Index" class="d-flex">
-    <input type="text" name="filter" value="@ViewBag.Filter" class="form-control mr-2" placeholder="Enter letters/numbers" />
-    <button type="submit" class="btn btn-primary">Search</button>
+        <input type="text" name="filter" value="@ViewBag.Filter" class="form-control mr-2" placeholder="Enter letters or numbers" />
+        <button type="submit" class="btn btn-primary">Search</button>
+        </form>  
+  
+
 </div>
         <div class="mb-4">
-            <a href="?sortOrder=@(ViewBag.SortOrder == "asc" ? "desc" : "asc")" class="ml-3 align-self-center">Sort by Price</a>
+    <a href="?sortOrder=@(ViewBag.SortOrder == "asc" ? "desc" : "asc")&filter=@ViewBag.Filter" class="ml-3 align-self-center">Sort by Price</a>
        </div>
        <div>        
         <a href="@Url.Action("AddPlate")" class="btn btn-success">Add a New Plate</a>
@@ -26,6 +28,7 @@
             <th>Plate</th>
             <th>Purchase Price</th>
             <th>Sale Price</th>
+            <th>Reservation status</th>
         </tr>
     </thead>
     <tbody>
@@ -35,6 +38,16 @@
                 <td>@p.Registration</td>
                 <td>@p.PurchasePrice</td>
                 <td>@(p.SalePrice * 1.2m)</td>
+                <td>@(p.Reserved ? "Reserved" : "Unreserved")</td>
+                <td>
+                    <form method="post" action="/Home/ToggleReservation" id="reservationForm-@p.Id">
+                @Html.AntiForgeryToken()
+                        <input type="hidden" name="plateId" value="@p.Id" />
+                        <button type="submit" class="btn btn-warning">
+                            @(p.Reserved ? "Unreserve" : "Reserve")
+                        </button>
+                    </form>
+                </td>
             </tr>
         }
     </tbody>

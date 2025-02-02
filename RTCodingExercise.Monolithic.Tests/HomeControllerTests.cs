@@ -8,16 +8,19 @@ using System.Threading.Tasks;
 using System;
 using Xunit;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 
 public class HomeControllerTests
 {
     private readonly Mock<IPlateService> _mockPlateService;
+    private readonly Mock<ILogger<HomeController>> _mockLogger;
     private readonly HomeController _controller;
-
+    
     public HomeControllerTests()
     {
         _mockPlateService = new Mock<IPlateService>();
-        _controller = new HomeController(null, _mockPlateService.Object);
+        _mockLogger = new Mock<ILogger<HomeController>>();
+        _controller = new HomeController(_mockLogger.Object, _mockPlateService.Object);
     }
 
     [Fact]
@@ -29,7 +32,7 @@ public class HomeControllerTests
             new Plate { Id = Guid.NewGuid(), Registration = "B456", PurchasePrice = 200, SalePrice = 440 }
         };
 
-        _mockPlateService.Setup(service => service.GetPlatesForPageAsync(1, 20, "asc")).ReturnsAsync(plates);
+        _mockPlateService.Setup(service => service.GetPlatesForPageAsync(1, 20, "asc", null)).ReturnsAsync(plates);
 
         var result = await _controller.Index(1) as ViewResult;
 
@@ -61,7 +64,7 @@ public class HomeControllerTests
     [Fact]
     public async Task Index_ShouldReturnEmptyList_WhenNoPlatesExist()
     {
-        _mockPlateService.Setup(service => service.GetPlatesForPageAsync(1, 20, "asc")).ReturnsAsync(new List<Plate>());
+        _mockPlateService.Setup(service => service.GetPlatesForPageAsync(1, 20, "asc", null)).ReturnsAsync(new List<Plate>());
 
         var result = await _controller.Index(1) as ViewResult;
 
@@ -83,6 +86,28 @@ public class HomeControllerTests
     }
 
     [Fact]
+    public async Task Index_ShouldReturnPaginatedPlates()
+    {
+        // Arrange
+        var plates = new List<Plate>
+    {
+        new Plate { Id = Guid.NewGuid(), Registration = "A123", SalePrice = 100 },
+        new Plate { Id = Guid.NewGuid(), Registration = "B456", SalePrice = 200 },
+        new Plate { Id = Guid.NewGuid(), Registration = "C789", SalePrice = 300 }
+    };
+
+        _mockPlateService.Setup(service => service.GetPlatesForPageAsync(2, 20, "asc", null)).ReturnsAsync(plates.Skip(20).Take(20).ToList());
+
+        // Act
+        var result = await _controller.Index(2) as ViewResult;
+
+        // Assert
+        Assert.NotNull(result);
+        var model = result.Model as List<Plate>;
+        Assert.Empty(model); 
+    }
+
+    [Fact]
     public async Task GetPlatesForPageAsync_ShouldReturnPlatesSortedByPriceAsc()
     {
         // Arrange
@@ -93,7 +118,7 @@ public class HomeControllerTests
         new Plate { Id = Guid.NewGuid(), Registration = "C789", SalePrice = 200 }
     };
 
-        _mockPlateService.Setup(service => service.GetPlatesForPageAsync(1, 20, "asc")).ReturnsAsync(plates.OrderBy(p => p.SalePrice).ToList());
+        _mockPlateService.Setup(service => service.GetPlatesForPageAsync(1, 20, "asc", null)).ReturnsAsync(plates.OrderBy(p => p.SalePrice).ToList());
         
         // Act - Ascending
         var resultAsc = await _controller.Index(1) as ViewResult;
@@ -117,7 +142,7 @@ public class HomeControllerTests
         new Plate { Id = Guid.NewGuid(), Registration = "C789", SalePrice = 700 }
     };
 
-        _mockPlateService.Setup(service => service.GetPlatesForPageAsync(1, 20, "desc")).ReturnsAsync(plates.OrderByDescending(p => p.SalePrice).ToList());
+        _mockPlateService.Setup(service => service.GetPlatesForPageAsync(1, 20, "desc", null)).ReturnsAsync(plates.OrderByDescending(p => p.SalePrice).ToList());
 
         // Act - Descending
         var resultDesc = await _controller.Index(1, "desc") as ViewResult;
@@ -130,4 +155,45 @@ public class HomeControllerTests
         Assert.Equal(100, modelDesc[2].SalePrice);
     }
 
+    [Fact]
+    public async Task Index_ShouldReturnFilteredPlates_WhenFilterIsProvided()
+    {
+        // Arrange
+        var plates = new List<Plate>
+    {
+        new Plate { Id = Guid.NewGuid(), Registration = "A123", SalePrice = 100 },
+        new Plate { Id = Guid.NewGuid(), Registration = "B456", SalePrice = 200 }
+    };
+
+        _mockPlateService.Setup(service => service.GetPlatesForPageAsync(1, 20, "asc", "A")).ReturnsAsync(plates.Where(p => p.Registration.Contains("A123")).ToList());
+
+        // Act
+        var result = await _controller.Index(1, "asc", "A") as ViewResult;
+
+        // Assert
+        Assert.NotNull(result);
+        var model = result.Model as List<Plate>;
+        Assert.Single(model);
+        Assert.Equal("A123", model[0].Registration);
+    }
+
+    [Fact]
+    public async Task ToggleReservation_ShouldToggleReservationStatus()
+    {
+        // Arrange
+        var plateId = Guid.NewGuid();
+        var plate = new Plate { Id = plateId, Registration = "A123", Reserved = false };
+
+        _mockPlateService.Setup(service => service.GetPlateByIdAsync(plateId)).ReturnsAsync(plate);
+        _mockPlateService.Setup(service => service.SetPlateReservationStatusAsync(plateId, true)).Returns(Task.CompletedTask);
+
+        // Act
+        var result = await _controller.ToggleReservation(plateId) as RedirectToActionResult;
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal("Index", result.ActionName);
+    }
 }
+
+

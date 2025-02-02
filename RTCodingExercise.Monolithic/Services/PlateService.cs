@@ -31,10 +31,26 @@ namespace RTCodingExercise.Monolithic.Services
                 .ToListAsync();
         }
 
+
         public async Task AddPlateAsync(Plate plate)
         {
             _context.Plates.Add(plate);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<Plate> GetPlateByIdAsync(Guid plateId)
+        {
+            return await _context.Plates.FindAsync(plateId);
+        }
+
+        // Method to mark plate as reserved or unreserved
+        public async Task SetPlateReservationStatusAsync(Guid plateId, bool isReserved)
+        {
+            var plate = await _context.Plates.FindAsync(plateId);
+            if (plate == null) throw new KeyNotFoundException("Plate not found");
+
+            plate.Reserved = isReserved;
+            await _context.SaveChangesAsync();            
         }
     }
 }
