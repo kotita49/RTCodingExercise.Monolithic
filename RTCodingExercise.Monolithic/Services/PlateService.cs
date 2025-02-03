@@ -16,15 +16,21 @@ namespace RTCodingExercise.Monolithic.Services
         {
             var query = _context.Plates.AsQueryable();
 
+            // Filter by registration 
             if (!string.IsNullOrEmpty(filter))
             {
                 query = query.Where(p => p.Registration.Contains(filter));
             }
 
+            // Filter out reserved plates
+            query = query.Where(p => !p.Reserved);
+
+            // Sort by price
             query = sortOrder == "desc"
                 ? query.OrderByDescending(p => p.SalePrice)
                 : query.OrderBy(p => p.SalePrice);
 
+            // Pagination
             return await query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)

@@ -20,6 +20,7 @@ namespace RTCodingExercise.Monolithic.Controllers
         {
            const int pageSize = 20;
            var plates = await _plateService.GetPlatesForPageAsync(page, pageSize, sortOrder, filter);
+           
            ViewBag.Page = page;
            ViewBag.SortOrder = sortOrder;
            ViewBag.Filter = filter; 

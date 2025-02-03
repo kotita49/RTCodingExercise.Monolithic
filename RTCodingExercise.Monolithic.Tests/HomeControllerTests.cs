@@ -161,8 +161,9 @@ public class HomeControllerTests
         // Arrange
         var plates = new List<Plate>
     {
-        new Plate { Id = Guid.NewGuid(), Registration = "A123", SalePrice = 100 },
-        new Plate { Id = Guid.NewGuid(), Registration = "B456", SalePrice = 200 }
+        new Plate { Id = Guid.NewGuid(), Registration = "A123", SalePrice = 100, Reserved = false },
+        new Plate { Id = Guid.NewGuid(), Registration = "B456", SalePrice = 200, Reserved = false },
+        new Plate { Id = Guid.NewGuid(), Registration = "A333", SalePrice = 400, Reserved = true }
     };
 
         _mockPlateService.Setup(service => service.GetPlatesForPageAsync(1, 20, "asc", "A")).ReturnsAsync(plates.Where(p => p.Registration.Contains("A123")).ToList());
@@ -193,6 +194,52 @@ public class HomeControllerTests
         // Assert
         Assert.NotNull(result);
         Assert.Equal("Index", result.ActionName);
+    }
+
+    [Fact]
+    public async Task GetPlatesForPageAsync_ShouldReturnOnlyPlatesForSale()
+    {
+        // Arrange
+        var plates = new List<Plate>
+    {
+        new Plate { Id = Guid.NewGuid(), Registration = "A123", SalePrice = 100, Reserved = false },
+        new Plate { Id = Guid.NewGuid(), Registration = "B456", SalePrice = 200, Reserved = true },
+        new Plate { Id = Guid.NewGuid(), Registration = "C789", SalePrice = 300, Reserved = false }
+    };
+
+        _mockPlateService.Setup(service => service.GetPlatesForPageAsync(1, 20, "asc", null))
+                        .ReturnsAsync(plates.Where(p => !p.Reserved).ToList());
+
+        // Act
+        var result = await _controller.Index(1) as ViewResult;
+        var model = result.Model as List<Plate>;
+
+        // Assert
+        Assert.NotNull(model);
+        Assert.Equal(2, model.Count);
+        Assert.DoesNotContain(model, p => p.Reserved); 
+    }
+
+    [Fact]
+    public async Task GetPlatesForPageAsync_ShouldReturnEmptyList_WhenAllPlatesAreReserved()
+    {
+        // Arrange
+        var plates = new List<Plate>
+    {
+        new Plate { Id = Guid.NewGuid(), Registration = "A123", SalePrice = 100, Reserved = true },
+        new Plate { Id = Guid.NewGuid(), Registration = "B456", SalePrice = 200, Reserved = true }
+    };
+
+        _mockPlateService.Setup(service => service.GetPlatesForPageAsync(1, 20, "asc", null))
+                        .ReturnsAsync(new List<Plate>());
+
+        // Act
+        var result = await _controller.Index(1) as ViewResult;
+        var model = result.Model as List<Plate>;
+
+        // Assert
+        Assert.NotNull(model);
+        Assert.Empty(model); 
     }
 }
 
